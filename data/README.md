@@ -41,16 +41,194 @@ python scripts/generate_nodes_json.py --github --output data/nodes.json
 
 ### File Structure
 
+The `nodes.json` file is an array of node objects. Each node has the following schema:
+
 ```json
 [
   {
     "title": "node-name",
-    "description": "What the node does",
-    "author": "Author name",
+    "description": "Node description extracted from README",
+    "preview": null,
+    "author": "Author Name",
+    "github": "https://github.com/dora-rs/dora-hub",
+    "downloads": null,
+    "last_commit": "2024-01-15T10:00:00Z",
+    "last_release": null,
     "license": "Apache-2.0",
-    "install": "pip install dora-node",
+    "install": "pip install dora-node-name",
+    "category": null,
+    "website": "node-name",
     "source": "https://github.com/dora-rs/dora-hub/tree/main/node-hub/node-name",
     "tags": ["python", "image", "video"]
   }
 ]
+```
+
+#### Field Descriptions
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Node name/identifier |
+| `description` | string | Brief description of node functionality |
+| `preview` | string\|null | Preview image URL (currently unused) |
+| `author` | string\|null | Node author name |
+| `github` | string | Repository URL |
+| `downloads` | number\|null | Download count (currently unused) |
+| `last_commit` | string\|null | ISO 8601 timestamp of last commit |
+| `last_release` | string\|null | Last release version (currently unused) |
+| `license` | string\|null | SPDX license identifier |
+| `install` | string\|null | Installation command (e.g., `pip install ...`) |
+| `category` | string\|null | Node category (currently unused) |
+| `website` | string | Node identifier/website |
+| `source` | string | Direct link to node source code |
+| `tags` | string[] | Array of tags for filtering (e.g., `python`, `image`, `audio`) |
+
+### Searching with jq
+
+[jq](https://jqlang.github.io/jq/) is a powerful command-line JSON processor that makes it easy to query and filter the nodes.json file.
+
+#### Installation
+
+```bash
+# macOS
+brew install jq
+
+# Ubuntu/Debian
+sudo apt-get install jq
+
+# Fedora
+sudo dnf install jq
+```
+
+#### Basic Queries
+
+**List all node titles:**
+```bash
+jq '.[].title' data/nodes.json
+```
+
+**Count total nodes:**
+```bash
+jq 'length' data/nodes.json
+```
+
+**Get a specific node by title:**
+```bash
+jq '.[] | select(.title == "dora-yolo")' data/nodes.json
+```
+
+#### Filtering by Tags
+
+**Find all Python nodes:**
+```bash
+jq '.[] | select(.tags | contains(["python"]))' data/nodes.json
+```
+
+**Find all image processing nodes:**
+```bash
+jq '.[] | select(.tags | contains(["image"]))' data/nodes.json
+```
+
+**Find nodes with multiple tags (Python AND audio):**
+```bash
+jq '.[] | select(.tags | contains(["python", "audio"]))' data/nodes.json
+```
+
+**Find nodes with any of several tags (vision OR audio):**
+```bash
+jq '.[] | select(.tags | any(. == "image" or . == "audio"))' data/nodes.json
+```
+
+#### Filtering by Other Fields
+
+**Find nodes with installation commands:**
+```bash
+jq '.[] | select(.install != null)' data/nodes.json
+```
+
+**Find nodes by author:**
+```bash
+jq '.[] | select(.author == "Dora Team")' data/nodes.json
+```
+
+**Find nodes with specific license:**
+```bash
+jq '.[] | select(.license == "Apache-2.0")' data/nodes.json
+```
+
+**Find recently updated nodes (within last 30 days):**
+```bash
+jq --arg date "$(date -u -d '30 days ago' +%Y-%m-%d)" \
+  '.[] | select(.last_commit != null and .last_commit > $date)' \
+  data/nodes.json
+```
+
+#### Output Formatting
+
+**Show only titles and descriptions:**
+```bash
+jq '.[] | {title, description}' data/nodes.json
+```
+
+**Create a compact list with titles and tags:**
+```bash
+jq '.[] | "\(.title): \(.tags | join(", "))"' data/nodes.json
+```
+
+**Get installation commands for all Python nodes:**
+```bash
+jq -r '.[] | select(.tags | contains(["python"])) | .install' data/nodes.json
+```
+
+**Generate a markdown list of nodes:**
+```bash
+jq -r '.[] | "- **\(.title)**: \(.description)"' data/nodes.json
+```
+
+#### Advanced Queries
+
+**Group nodes by primary tag:**
+```bash
+jq 'group_by(.tags[0]) | map({tag: .[0].tags[0], nodes: map(.title)})' data/nodes.json
+```
+
+**Get all unique tags:**
+```bash
+jq '[.[].tags[]] | unique' data/nodes.json
+```
+
+**Count nodes by tag:**
+```bash
+jq '[.[].tags[]] | group_by(.) | map({tag: .[0], count: length})' data/nodes.json
+```
+
+**Find nodes matching a description keyword:**
+```bash
+jq '.[] | select(.description | test("detection"; "i"))' data/nodes.json
+```
+
+#### Practical Examples
+
+**Create a quick reference list for a specific category:**
+```bash
+# All audio nodes with install commands
+jq -r '.[] | select(.tags | contains(["audio"])) |
+  "## \(.title)\n\(.description)\n```bash\n\(.install)\n```\n"' \
+  data/nodes.json
+```
+
+**Export Python nodes to a new JSON file:**
+```bash
+jq '[.[] | select(.tags | contains(["python"]))]' \
+  data/nodes.json > python_nodes.json
+```
+
+**Find nodes without installation instructions:**
+```bash
+jq '.[] | select(.install == null) | .title' data/nodes.json
+```
+
+**Search for nodes by partial name match:**
+```bash
+jq '.[] | select(.title | contains("yolo"))' data/nodes.json
 ```
