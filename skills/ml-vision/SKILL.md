@@ -66,23 +66,7 @@ Dora provides a rich ecosystem of vision nodes for building perception pipelines
 
 ## Image Format Convention
 
-All images use flattened numpy arrays with metadata:
-
-```python
-# Metadata fields
-metadata = {
-    "width": "640",
-    "height": "480",
-    "encoding": "bgr8"  # or "rgb8", "gray8", "jpeg", etc.
-}
-
-# Supported encodings
-# bgr8  - OpenCV default (3 channels, uint8)
-# rgb8  - RGB format (3 channels, uint8)
-# gray8 - Grayscale (1 channel, uint8)
-# jpeg  - JPEG compressed
-# png   - PNG compressed
-```
+See [CODE_TEMPLATES.md](../../data/CODE_TEMPLATES.md#image-handling-python) for image data handling patterns.
 
 ## Complete Vision Pipeline
 

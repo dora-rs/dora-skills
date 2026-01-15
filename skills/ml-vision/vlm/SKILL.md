@@ -70,18 +70,15 @@ Integrate Vision-Language Models (VLM) for image understanding and visual reason
 
 ```yaml
 nodes:
-  # Camera input
   - id: camera
+    # See COMMON_NODES.md#camera-node
     build: pip install opencv-video-capture
     path: opencv-video-capture
     inputs:
       tick: dora/timer/millis/500  # Slow for VLM
     outputs:
       - image
-    env:
-      CAPTURE_PATH: "0"
 
-  # Prompt generator (static or dynamic)
   - id: prompt
     path: ./prompt_generator.py
     inputs:
@@ -89,7 +86,6 @@ nodes:
     outputs:
       - question
 
-  # Vision-language model
   - id: vlm
     build: pip install dora-internvl
     path: dora-internvl
@@ -99,7 +95,6 @@ nodes:
     outputs:
       - text
 
-  # Output handler
   - id: output
     path: ./output_handler.py
     inputs:
@@ -252,26 +247,9 @@ for event in node:
 
 ## Performance Optimization
 
-### Reduce Inference Frequency
-
-```yaml
-inputs:
-  tick: dora/timer/millis/1000  # 1 FPS for VLM
-```
-
-### Use Smaller Models
-
-```yaml
-env:
-  MODEL: InternVL2-1B  # Smallest, fastest
-```
-
-### Quantization
-
-```yaml
-env:
-  QUANTIZATION: int4   # 4-bit quantization
-```
+- **Reduce frequency:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#timer-patterns)
+- **Use smaller models:** InternVL2-1B or Qwen2-VL-2B
+- **Device selection:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#device-configuration)
 
 ## Use Cases
 

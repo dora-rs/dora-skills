@@ -9,6 +9,9 @@ Generate natural speech from text using Kokoro TTS.
 
 ## Node Configuration
 
+See [COMMON_NODES.md](../../../data/COMMON_NODES.md#piper-text-to-speech-node) for standard TTS configuration.
+
+**Kokoro TTS variant:**
 ```yaml
 - id: tts
   build: pip install dora-kokoro-tts
@@ -58,32 +61,10 @@ env:
   DEVICE: cuda           # cuda, mps, or cpu
 ```
 
-## Input Format
+## Input/Output Format
 
-Text strings:
-
-```python
-from dora import Node
-import pyarrow as pa
-
-node = Node()
-
-text = "Hello, how can I help you today?"
-node.send_output("text", pa.array([text]))
-```
-
-## Output Format
-
-Audio data:
-
-```python
-# Audio metadata
-metadata = {
-    "sample_rate": "24000"
-}
-
-# Audio: float32 array
-```
+- **Input:** Text string
+- **Output:** Float32 audio with sample_rate metadata. See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#audio-handling-python).
 
 ## Complete TTS Pipeline
 
@@ -232,33 +213,7 @@ env:
 
 ## Performance Optimization
 
-### GPU Acceleration
-
-```yaml
-env:
-  DEVICE: cuda
-```
-
-### Batch Processing
-
-```python
-# Batch multiple texts for efficiency
-texts = ["Hello.", "How are you?", "Goodbye."]
-for text in texts:
-    node.send_output("text", pa.array([text]))
-```
-
-### Caching
-
-```python
-# Cache frequently used phrases
-tts_cache = {}
-
-def synthesize(text):
-    if text not in tts_cache:
-        tts_cache[text] = generate_audio(text)
-    return tts_cache[text]
-```
+See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#device-configuration) for GPU acceleration.
 
 ## Quality Settings
 

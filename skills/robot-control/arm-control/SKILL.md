@@ -9,32 +9,15 @@ Control robotic arms including Piper, Aloha, and Reachy.
 
 ## Piper Arm Configuration
 
-```yaml
-- id: piper
-  build: pip install dora-piper
-  path: dora-piper
-  inputs:
-    tick: dora/timer/millis/50        # 20 Hz state update
-    joint_action: controller/action   # Joint commands
-    end_pose: controller/pose         # End-effector pose
-    gripper_action: controller/grip   # Gripper control
-  outputs:
-    - jointstate     # Current joint positions
-    - end_pose       # Current end-effector pose
-    - gripper_state  # Gripper state
-  env:
-    CAN_BUS: can0              # CAN interface
-    RATE_LIMIT_HZ: "20"        # Command rate limit
-```
+See [COMMON_NODES.md](../../../data/COMMON_NODES.md#piper-robot-arm-node) for standard Piper arm configuration.
 
-## Configuration Options
+**Serial port configuration:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#robot-control-configuration).
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `CAN_BUS` | CAN interface name | can0 |
-| `RATE_LIMIT_HZ` | Max command rate | 20 |
-| `JOINT_LIMITS` | Enable joint limits | true |
-| `VELOCITY_SCALE` | Max velocity (0-1) | 0.5 |
+**Configuration options:**
+- `CAN_BUS`: CAN interface name (default: can0)
+- `RATE_LIMIT_HZ`: Max command rate (default: 20)
+- `JOINT_LIMITS`: Enable joint limits (default: true)
+- `VELOCITY_SCALE`: Max velocity 0-1 (default: 0.5)
 
 ## Input Formats
 
@@ -91,8 +74,8 @@ for event in node:
 
 ```yaml
 nodes:
-  # Camera for visual feedback
   - id: camera
+    # See COMMON_NODES.md#camera-node
     build: pip install opencv-video-capture
     path: opencv-video-capture
     inputs:
@@ -100,8 +83,8 @@ nodes:
     outputs:
       - image
 
-  # Object detection
   - id: detector
+    # See COMMON_NODES.md#yolo-detection-node
     build: pip install dora-yolo
     path: dora-yolo
     inputs:
@@ -109,7 +92,6 @@ nodes:
     outputs:
       - bbox
 
-  # Motion planner
   - id: planner
     path: ./motion_planner.py
     inputs:
@@ -118,8 +100,8 @@ nodes:
     outputs:
       - action
 
-  # Arm controller
   - id: arm
+    # See COMMON_NODES.md#piper-robot-arm-node
     build: pip install dora-piper
     path: dora-piper
     inputs:
@@ -186,9 +168,10 @@ Use dora-pytorch-kinematics for IK:
 
 ### Leader-Follower
 
+See [COMMON_NODES.md](../../../data/COMMON_NODES.md#piper-robot-arm-node) for leader-follower configuration.
+
 ```yaml
 nodes:
-  # Leader arm (human control)
   - id: leader
     build: pip install dora-piper
     path: dora-piper
@@ -198,9 +181,8 @@ nodes:
       - jointstate
     env:
       CAN_BUS: can0
-      MODE: passive  # No motor control
+      MODE: passive
 
-  # Follower arm (robot)
   - id: follower
     build: pip install dora-piper
     path: dora-piper
@@ -212,17 +194,6 @@ nodes:
     env:
       CAN_BUS: can1
       MODE: active
-```
-
-### Recording Teleoperation
-
-```yaml
-- id: recorder
-  path: ./teleoperation_recorder.py
-  inputs:
-    leader_joints: leader/jointstate
-    follower_joints: follower/jointstate
-    image: camera/image
 ```
 
 ## Aloha Bimanual Setup

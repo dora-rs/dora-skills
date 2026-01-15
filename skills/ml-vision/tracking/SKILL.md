@@ -9,27 +9,9 @@ Track points across video frames using CoTracker for motion analysis.
 
 ## Node Configuration
 
-```yaml
-- id: cotracker
-  build: pip install dora-cotracker
-  path: dora-cotracker
-  inputs:
-    image: camera/image
-    points: initial/points  # Starting points to track
-  outputs:
-    - tracks               # Tracked point positions
-    - visibility           # Point visibility status
-  env:
-    MODEL: cotracker2      # Model variant
-    DEVICE: cuda           # cuda, mps, or cpu
-```
+See [COMMON_NODES.md](../../../data/COMMON_NODES.md#cotracker-tracking-node) for standard CoTracker configuration.
 
-## Model Options
-
-| Model | Description |
-|-------|-------------|
-| `cotracker2` | Latest version, best quality |
-| `cotracker` | Original version |
+**Device configuration:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#device-configuration).
 
 ## Input Format
 
@@ -86,19 +68,17 @@ for i, visible in enumerate(visibility):
 
 ```yaml
 nodes:
-  # Camera input
   - id: camera
+    # See COMMON_NODES.md#camera-node
     build: pip install opencv-video-capture
     path: opencv-video-capture
     inputs:
       tick: dora/timer/millis/33
     outputs:
       - image
-    env:
-      CAPTURE_PATH: "0"
 
-  # Initial point detection (YOLO)
   - id: yolo
+    # See COMMON_NODES.md#yolo-detection-node
     build: pip install dora-yolo
     path: dora-yolo
     inputs:
@@ -106,7 +86,6 @@ nodes:
     outputs:
       - bbox
 
-  # Convert boxes to points
   - id: points
     path: ./bbox_to_points.py
     inputs:
@@ -114,8 +93,8 @@ nodes:
     outputs:
       - points
 
-  # Track points
   - id: tracker
+    # See COMMON_NODES.md#cotracker-tracking-node
     build: pip install dora-cotracker
     path: dora-cotracker
     inputs:
@@ -125,7 +104,6 @@ nodes:
       - tracks
       - visibility
 
-  # Visualization
   - id: viz
     build: pip install dora-rerun
     path: dora-rerun

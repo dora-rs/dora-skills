@@ -40,19 +40,13 @@ Record demonstrations and sensor data for robot learning.
 
 ## Configuration Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `OUTPUT_DIR` | Save directory | ./recordings |
-| `FORMAT` | parquet, ario, lerobot | parquet |
-| `EPISODE_PREFIX` | Episode name prefix | episode |
-| `AUTO_EPISODE` | Auto-increment episodes | true |
-| `RECORD_HZ` | Recording frequency | 20 |
+See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#recording-configuration) for recording settings.
 
 ## Complete Recording Pipeline
 
 ```yaml
 nodes:
-  # Cameras
+  # Cameras (see COMMON_NODES.md#camera-node)
   - id: wrist_cam
     build: pip install opencv-video-capture
     path: opencv-video-capture
@@ -62,8 +56,6 @@ nodes:
       - image
     env:
       CAPTURE_PATH: "0"
-      IMAGE_WIDTH: "640"
-      IMAGE_HEIGHT: "480"
 
   - id: top_cam
     build: pip install opencv-video-capture
@@ -75,7 +67,7 @@ nodes:
     env:
       CAPTURE_PATH: "2"
 
-  # Robot arms (teleoperation)
+  # Robot arms (see COMMON_NODES.md#piper-robot-arm-node)
   - id: leader
     build: pip install dora-piper
     path: dora-piper

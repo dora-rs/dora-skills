@@ -47,12 +47,7 @@ Control Dynamixel and Feetech servo motors.
 
 ## Configuration Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `SERIAL_PORT` | Serial port path | /dev/ttyUSB0 |
-| `BAUD_RATE` | Communication speed | 1000000 |
-| `MOTOR_IDS` | Comma-separated IDs | 1 |
-| `PROTOCOL` | Dynamixel protocol | 2.0 |
+See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#robot-control-configuration) for serial port configuration.
 
 ## Position Control
 

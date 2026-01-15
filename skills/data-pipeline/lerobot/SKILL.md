@@ -66,7 +66,7 @@ lerobot_dataset/
 
 ```yaml
 nodes:
-  # Cameras
+  # Cameras (see COMMON_NODES.md#camera-node)
   - id: wrist_cam
     build: pip install opencv-video-capture
     path: opencv-video-capture
@@ -76,8 +76,6 @@ nodes:
       - image
     env:
       CAPTURE_PATH: "0"
-      IMAGE_WIDTH: "640"
-      IMAGE_HEIGHT: "480"
 
   - id: top_cam
     build: pip install opencv-video-capture
@@ -89,7 +87,7 @@ nodes:
     env:
       CAPTURE_PATH: "2"
 
-  # Teleoperation
+  # Teleoperation (see COMMON_NODES.md#piper-robot-arm-node)
   - id: leader
     build: pip install dora-piper
     path: dora-piper

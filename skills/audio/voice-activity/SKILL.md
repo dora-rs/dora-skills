@@ -7,85 +7,39 @@ description: Voice activity detection and microphone input for dora-rs. Use when
 
 Capture audio and detect speech using VAD (Voice Activity Detection).
 
-## Microphone Node
+## Node Configuration
 
-```yaml
-- id: microphone
-  build: pip install dora-microphone
-  path: dora-microphone
-  outputs:
-    - audio
-  env:
-    SAMPLE_RATE: "16000"
-    CHANNELS: "1"
-    CHUNK_SIZE: "512"
-    DEVICE_INDEX: "0"
-```
+**Microphone:** See [COMMON_NODES.md](../../../data/COMMON_NODES.md#microphone-node).
 
-## VAD Node (Silero)
+**VAD:** See [COMMON_NODES.md](../../../data/COMMON_NODES.md#vad-voice-activity-detection-node).
 
-```yaml
-- id: vad
-  build: pip install dora-vad
-  path: dora-vad
-  inputs:
-    audio: microphone/audio
-  outputs:
-    - audio        # Audio chunks when speech detected
-    - speaking     # Boolean indicator
-  env:
-    THRESHOLD: "0.5"
-    MIN_SPEECH_DURATION: "0.25"
-    MAX_SPEECH_DURATION: "30.0"
-    SPEECH_PAD_MS: "300"
-```
-
-## Configuration Options
-
-### Microphone
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `SAMPLE_RATE` | Samples per second | 16000 |
-| `CHANNELS` | Audio channels | 1 |
-| `CHUNK_SIZE` | Samples per chunk | 512 |
-| `DEVICE_INDEX` | Microphone device | 0 |
-
-### VAD
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `THRESHOLD` | Speech detection threshold (0-1) | 0.5 |
-| `MIN_SPEECH_DURATION` | Min speech length (seconds) | 0.25 |
-| `MAX_SPEECH_DURATION` | Max speech length (seconds) | 30.0 |
-| `SPEECH_PAD_MS` | Padding around speech (ms) | 300 |
+**Configuration:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#audio-configuration) for sample rates and [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#vad-sensitivity) for VAD threshold tuning.
 
 ## Complete VAD Pipeline
 
 ```yaml
 nodes:
-  # Audio capture
   - id: microphone
+    # See COMMON_NODES.md#microphone-node
     build: pip install dora-microphone
     path: dora-microphone
     outputs:
       - audio
     env:
       SAMPLE_RATE: "16000"
-      CHUNK_SIZE: "512"
 
-  # Voice activity detection
   - id: vad
+    # See COMMON_NODES.md#vad-node
     build: pip install dora-vad
     path: dora-vad
     inputs:
       audio: microphone/audio
     outputs:
-      - audio      # Filtered audio (speech only)
-      - speaking   # Speaking indicator
+      - audio
+      - speaking
 
-  # Speech to text (only processes speech)
   - id: whisper
+    # See COMMON_NODES.md#whisper-speech-to-text-node
     build: pip install dora-distil-whisper
     path: dora-distil-whisper
     inputs:
@@ -93,7 +47,6 @@ nodes:
     outputs:
       - text
 
-  # Speaking indicator handler
   - id: indicator
     path: ./speaking_indicator.py
     inputs:
@@ -104,33 +57,14 @@ nodes:
 
 ### Speech Audio
 
-```python
-from dora import Node
-import numpy as np
-
-node = Node()
-
-for event in node:
-    if event["id"] == "audio":
-        # Speech audio chunk
-        audio = event["value"].to_numpy()
-        sample_rate = int(event["metadata"]["sample_rate"])
-
-        # Process speech audio
-        process_speech(audio, sample_rate)
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#audio-handling-python) for audio handling.
 
 ### Speaking Indicator
 
 ```python
-for event in node:
-    if event["id"] == "speaking":
-        is_speaking = event["value"][0].as_py()
-
-        if is_speaking:
-            print("Speech detected - listening...")
-        else:
-            print("Silence detected - waiting...")
+is_speaking = event["value"][0].as_py()
+if is_speaking:
+    print("Speech detected")
 ```
 
 ## Speaking Indicator Node
@@ -159,32 +93,7 @@ for event in node:
 
 ## Threshold Tuning
 
-```yaml
-env:
-  # Higher threshold = less false positives (stricter)
-  THRESHOLD: "0.7"
-
-  # Lower threshold = more sensitive (may include noise)
-  THRESHOLD: "0.3"
-```
-
-## Noise Environments
-
-### Noisy Environment
-
-```yaml
-env:
-  THRESHOLD: "0.7"           # Higher threshold
-  MIN_SPEECH_DURATION: "0.5" # Longer minimum
-```
-
-### Quiet Environment
-
-```yaml
-env:
-  THRESHOLD: "0.3"           # Lower threshold
-  MIN_SPEECH_DURATION: "0.1" # Shorter minimum
-```
+See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#vad-sensitivity) for threshold configuration based on environment.
 
 ## Device Selection
 

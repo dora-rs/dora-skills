@@ -9,80 +9,37 @@ Generate precise segmentation masks using SAM2 (Segment Anything Model 2).
 
 ## Node Configuration
 
-```yaml
-- id: sam2
-  build: pip install dora-sam2
-  path: dora-sam2
-  inputs:
-    image: camera/image
-    bbox: detector/bbox      # Bounding box prompts
-  outputs:
-    - mask
-  env:
-    MODEL: sam2-hiera-small  # Model variant
-    DEVICE: cuda             # cuda, mps, or cpu
-```
+See [COMMON_NODES.md](../../../data/COMMON_NODES.md#sam2-segmentation-node) for standard SAM2 configuration.
 
-## Model Options
-
-| Model | Size | Speed | Quality |
-|-------|------|-------|---------|
-| `sam2-hiera-tiny` | Tiny | Fastest | Good |
-| `sam2-hiera-small` | Small | Fast | Better |
-| `sam2-hiera-base` | Base | Balanced | High |
-| `sam2-hiera-large` | Large | Slower | Best |
+**Model options:** See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#vision-models).
 
 ## Input Prompts
 
 ### From Bounding Boxes
-
-```yaml
-inputs:
-  image: camera/image
-  bbox: yolo/bbox  # YOLO detection boxes
-```
+Use YOLO detections as prompts (see [COMMON_NODES.md](../../../data/COMMON_NODES.md#sam2-segmentation-node)).
 
 ### From Points
-
-```yaml
-inputs:
-  image: camera/image
-  points: click/points  # User-selected points
-```
+User-selected points can be used as prompts.
 
 ## Output Format
 
-Segmentation masks as Arrow arrays:
-
-```python
-# Mask metadata
-metadata = {
-    "width": "640",
-    "height": "480",
-    "encoding": "mask"  # Binary mask
-}
-
-# Mask data: flattened boolean array (H * W)
-# 1 = object, 0 = background
-```
+Binary masks (1 = object, 0 = background) as flattened arrays with width/height metadata.
 
 ## Complete Pipeline: Detection + Segmentation
 
 ```yaml
 nodes:
-  # Camera
   - id: camera
+    # See COMMON_NODES.md#camera-node
     build: pip install opencv-video-capture
     path: opencv-video-capture
     inputs:
       tick: dora/timer/millis/33
     outputs:
       - image
-    env:
-      CAPTURE_PATH: "0"
 
-  # Object detection
   - id: yolo
+    # See COMMON_NODES.md#yolo-detection-node
     build: pip install dora-yolo
     path: dora-yolo
     inputs:
@@ -90,8 +47,8 @@ nodes:
     outputs:
       - bbox
 
-  # Segmentation from detections
   - id: sam2
+    # See COMMON_NODES.md#sam2-segmentation-node
     build: pip install dora-sam2
     path: dora-sam2
     inputs:
@@ -100,7 +57,6 @@ nodes:
     outputs:
       - mask
 
-  # Visualization
   - id: viz
     build: pip install dora-rerun
     path: dora-rerun
@@ -147,11 +103,10 @@ for event in node:
 
 ## Interactive Segmentation
 
-Create point prompts from user input:
+Create point prompts from user input (left-click = foreground, right-click = background):
 
 ```yaml
 nodes:
-  # Click handler node
   - id: click
     path: ./click_handler.py
     inputs:
@@ -159,7 +114,6 @@ nodes:
     outputs:
       - points
 
-  # Segment from clicks
   - id: sam2
     build: pip install dora-sam2
     path: dora-sam2
@@ -170,66 +124,9 @@ nodes:
       - mask
 ```
 
-**click_handler.py:**
-```python
-import cv2
-import pyarrow as pa
-from dora import Node
-
-clicked_points = []
-
-def mouse_callback(event, x, y, flags, param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        clicked_points.append((x, y, 1))  # 1 = foreground
-    elif event == cv2.EVENT_RBUTTONDOWN:
-        clicked_points.append((x, y, 0))  # 0 = background
-
-node = Node()
-cv2.namedWindow("Click to segment")
-cv2.setMouseCallback("Click to segment", mouse_callback)
-
-for event in node:
-    if event["type"] == "INPUT" and event["id"] == "image":
-        # Display image
-        # ...
-
-        if clicked_points:
-            points = pa.array(clicked_points)
-            node.send_output("points", points)
-            clicked_points.clear()
-```
-
-## Multi-Object Segmentation
-
-Handle multiple objects:
-
-```python
-# Each bbox produces a separate mask
-for i, detection in enumerate(detections):
-    mask = masks[i]
-    # Process each object mask
-```
-
 ## Performance Tips
 
-### GPU Memory
-
-```yaml
-env:
-  # Use smaller model for limited GPU memory
-  MODEL: sam2-hiera-tiny
-  # Or use CPU
-  DEVICE: cpu
-```
-
-### Batch Processing
-
-```yaml
-inputs:
-  image:
-    source: camera/image
-    queue_size: 1  # Latest frame only
-```
+See [CONFIG_REFERENCE.md](../../../data/CONFIG_REFERENCE.md#performance-optimization-patterns) for GPU memory optimization and queue management.
 
 ## Applications
 
