@@ -53,5 +53,3 @@ jobs:
           git add data/nodes.json
           git commit -m "chore: Update nodes.json from dora-hub"
           git push
-How This Workflow Works
-
