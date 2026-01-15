@@ -346,37 +346,6 @@ dora start dataflow.yml --cpu-limit 2.0 --memory-limit 4G
 dora start dataflow.yml --env MODEL=yolov8n.pt --env DEVICE=cuda
 ```
 
-### Start on Boot (systemd)
-```bash
-# Create systemd service
-sudo nano /etc/systemd/system/dora-robot.service
-```
-
-```ini
-[Unit]
-Description=Dora Robot Dataflow
-After=network.target
-
-[Service]
-Type=simple
-User=robot
-WorkingDirectory=/home/robot/my-robot
-ExecStartPre=/usr/local/bin/dora up
-ExecStart=/usr/local/bin/dora start dataflow.yml --name robot
-ExecStop=/usr/local/bin/dora stop robot
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Enable and start:
-```bash
-sudo systemctl enable dora-robot
-sudo systemctl start dora-robot
-sudo systemctl status dora-robot
-```
-
 ## Troubleshooting
 
 | Issue | Solution |
@@ -426,49 +395,6 @@ sudo systemctl status dora-robot
    /start app1.yml
    /start app2.yml
    ```
-
-## Integration Examples
-
-### With Docker
-```dockerfile
-FROM python:3.11
-RUN pip install dora-rs
-COPY dataflow.yml .
-RUN dora build dataflow.yml --uv
-CMD ["sh", "-c", "dora up && dora start dataflow.yml && tail -f /dev/null"]
-```
-
-### With Docker Compose
-```yaml
-version: '3.8'
-services:
-  dora:
-    image: python:3.11
-    command: sh -c "dora up && dora start /app/dataflow.yml"
-    volumes:
-      - ./dataflow.yml:/app/dataflow.yml
-    restart: unless-stopped
-```
-
-### With Kubernetes
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: dora-robot
-spec:
-  containers:
-  - name: dora
-    image: python:3.11
-    command: ["dora", "start", "dataflow.yml"]
-    volumeMounts:
-    - name: config
-      mountPath: /app
-  volumes:
-  - name: config
-    configMap:
-      name: dora-config
-```
 
 ## Related Commands
 

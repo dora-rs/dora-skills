@@ -255,64 +255,6 @@ read -p "Enter UUID to stop: " UUID
 dora stop $UUID
 ```
 
-## Integration Examples
-
-### Shell script
-```bash
-#!/bin/bash
-# stop-robot.sh
-
-DATAFLOW_UUID=$(cat .dataflow-uuid)
-
-echo "Stopping robot dataflow..."
-dora stop $DATAFLOW_UUID
-
-if [ $? -eq 0 ]; then
-  echo "✓ Stopped successfully"
-  rm .dataflow-uuid
-else
-  echo "✗ Failed to stop"
-  exit 1
-fi
-```
-
-### Python script
-```python
-import subprocess
-import sys
-
-def stop_dataflow(uuid):
-    """Stop a dora dataflow by UUID"""
-    try:
-        result = subprocess.run(
-            ['dora', 'stop', uuid],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        print(f"✓ Stopped {uuid}")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"✗ Failed to stop {uuid}: {e.stderr}")
-        return False
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python stop.py <uuid>")
-        sys.exit(1)
-
-    uuid = sys.argv[1]
-    success = stop_dataflow(uuid)
-    sys.exit(0 if success else 1)
-```
-
-### Systemd service
-```bash
-# Stop dataflow when service stops
-[Service]
-ExecStop=/usr/local/bin/dora stop %n
-```
-
 ## Cleanup After Stop
 
 ### Remove logs

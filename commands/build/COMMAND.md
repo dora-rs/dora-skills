@@ -10,7 +10,7 @@ Build and install dependencies for nodes in a dora dataflow before running them.
 ## Usage
 
 ```
-/build [<dataflow-file>] [--uv] [--nodes <node-ids>]
+/build [<dataflow-file>] [--uv]
 ```
 
 ## Arguments
@@ -19,7 +19,6 @@ Build and install dependencies for nodes in a dora dataflow before running them.
 |----------|-------------|---------|
 | `<dataflow-file>` | Path to dataflow YAML | ./dataflow.yml |
 | `--uv` | Use uv package manager (faster) | false |
-| `--nodes` | Build specific nodes only | all |
 
 ## What It Does
 
@@ -75,23 +74,6 @@ Build completed in 2.3s (4x faster than pip)
 
 Builds nodes from a specific dataflow file.
 
-### Build specific nodes only
-
-```
-/build --nodes camera,detector
-```
-
-Builds only the camera and detector nodes:
-```bash
-$ dora build dataflow.yml --nodes camera,detector
-Building camera...
-  ✓ pip install opencv-video-capture
-Building detector...
-  ✓ pip install dora-yolo
-Skipping visualize
-Build completed!
-```
-
 ## Node Build Configuration
 
 In dataflow.yml, each node specifies its build command:
@@ -132,13 +114,7 @@ Always run build before first execution:
 Rebuild after modifying dataflow.yml:
 ```bash
 # Edit dataflow.yml to add new nodes
-/build --nodes new-node
-```
-
-### After Code Changes
-Rebuild Python nodes if using editable installs:
-```bash
-/build --nodes my-custom-node
+/build
 ```
 
 ### Dependency Updates
@@ -229,15 +205,6 @@ nano dataflow.yml
   run: dora run dataflow.yml
 ```
 
-### Docker Container
-```dockerfile
-FROM python:3.11
-COPY dataflow.yml .
-RUN pip install dora-rs uv
-RUN dora build dataflow.yml --uv
-CMD ["dora", "run", "dataflow.yml"]
-```
-
 ## Advanced Usage
 
 ### Parallel Builds
@@ -295,12 +262,6 @@ nodes:
 4. **Use uv for Speed**
    ```bash
    /build --uv  # Much faster than pip
-   ```
-
-5. **Build Incrementally**
-   ```bash
-   # Only rebuild changed nodes
-   /build --nodes new-node
    ```
 
 ## Related Commands
