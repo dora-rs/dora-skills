@@ -23,6 +23,20 @@ Add a node to an existing dataflow.yml file.
 
 ## Available Node Types
 
+**Dynamic Node Discovery**: For the complete and up-to-date list of nodes:
+1. Check if `data/nodes.json` exists in the repository
+2. If it exists, load and present all available nodes with rich metadata
+3. If not, fall back to the manual list below
+
+To generate/update nodes.json:
+```bash
+python scripts/generate_nodes_json.py --github --output data/nodes.json
+```
+
+See [docs/integrating-nodes-json.md](../../docs/integrating-nodes-json.md) for details.
+
+### Manual Node List (Fallback)
+
 ### Sensors
 - `camera` - OpenCV video capture
 - `microphone` - Audio input
