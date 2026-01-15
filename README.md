@@ -7,7 +7,7 @@
 <a name="english"></a>
 ## English
 
-Skills for building AI agents, workflows, and embodied intelligence with the [dora-rs](https://github.com/dora-rs/dora) dataflow framework.
+A **[Claude Code](https://claude.ai/code) skill package** for building AI agents, workflows, and embodied intelligence with the [dora-rs](https://github.com/dora-rs/dora) dataflow framework.
 
 **Focus**: Embodied Intelligence — combining perception, language models, and physical control.
 
@@ -49,10 +49,17 @@ dora run dataflow.yml
 
 ### Using with Claude Code
 
+**Installation:**
 ```bash
-# Clone to skills directory
-git clone https://github.com/dora-rs/dora-skills.git ~/.claude-code/skills/dora-skills
+# Install Claude Code
+npm install -g @anthropic-ai/claude-code
 
+# Clone skill package to skills directory
+git clone https://github.com/dora-rs/dora-skills.git ~/.claude-code/skills/dora-skills
+```
+
+**Usage:**
+```bash
 # Start Claude Code in your project
 cd my-robot-project
 claude-code
@@ -75,7 +82,7 @@ Works with Cursor IDE, Continue.dev, GitHub Copilot, Aider, or any LLM via direc
 <a name="chinese"></a>
 ## 中文
 
-使用 [dora-rs](https://github.com/dora-rs/dora) 数据流框架构建 AI Agent、工作流和具身智能应用的技能集。
+一个用于 **[Claude Code](https://claude.ai/code) 的技能包**，使用 [dora-rs](https://github.com/dora-rs/dora) 数据流框架构建 AI Agent、工作流和具身智能应用。
 
 **重点**: 具身智能 —— 融合感知、语言模型与物理控制。
 
@@ -117,10 +124,17 @@ dora run dataflow.yml
 
 ### 使用 Claude Code
 
+**安装:**
 ```bash
-# 克隆到技能目录
-git clone https://github.com/dora-rs/dora-skills.git ~/.claude-code/skills/dora-skills
+# 安装 Claude Code
+npm install -g @anthropic-ai/claude-code
 
+# 克隆技能包到技能目录
+git clone https://github.com/dora-rs/dora-skills.git ~/.claude-code/skills/dora-skills
+```
+
+**使用:**
+```bash
 # 在项目中启动 Claude Code
 cd my-robot-project
 claude-code
