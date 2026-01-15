@@ -1,0 +1,20 @@
+{
+  "name": "dora-skills",
+  "version": "0.1.0",
+  "description": "Skills for building robotic applications with dora-rs dataflow framework. Covers node development, ML/vision pipelines, audio processing, robot control, and data collection.",
+  "author": {
+    "name": "dora-rs community"
+  },
+  "homepage": "https://dora-rs.ai",
+  "repository": "https://github.com/dora-rs/dora",
+  "license": "Apache-2.0",
+  "keywords": [
+    "dora",
+    "robotics",
+    "dataflow",
+    "vision",
+    "ml",
+    "audio",
+    "lerobot"
+  ]
+}
