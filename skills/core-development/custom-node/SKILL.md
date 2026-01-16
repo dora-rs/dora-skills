@@ -11,32 +11,7 @@ Guide for creating custom nodes in Python, Rust, or C++.
 
 ### Basic Structure
 
-```python
-from dora import Node
-import pyarrow as pa
-
-def main():
-    node = Node()
-
-    for event in node:
-        if event["type"] == "INPUT":
-            # Get input data
-            input_id = event["id"]
-            data = event["value"]  # PyArrow array
-            metadata = event["metadata"]
-
-            # Process data
-            result = process(data)
-
-            # Send output
-            node.send_output("output_name", pa.array(result), metadata)
-
-        elif event["type"] == "STOP":
-            break
-
-if __name__ == "__main__":
-    main()
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#python-node-boilerplate) for the standard Python node template.
 
 ### Event Types
 
@@ -49,101 +24,19 @@ if __name__ == "__main__":
 
 ### Handling Multiple Inputs
 
-```python
-from dora import Node
-import pyarrow as pa
-
-node = Node()
-
-for event in node:
-    if event["type"] == "INPUT":
-        if event["id"] == "image":
-            # Handle image input
-            image_data = event["value"].to_numpy()
-            # Process image...
-
-        elif event["id"] == "command":
-            # Handle command input
-            command = event["value"][0].as_py()
-            # Execute command...
-
-        # Send result
-        node.send_output("result", pa.array([result]))
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#multiple-input-handling-python).
 
 ### Working with Image Data
 
-```python
-import numpy as np
-import pyarrow as pa
-
-# Receive image
-def handle_image(event):
-    metadata = event["metadata"]
-    width = int(metadata["width"])
-    height = int(metadata["height"])
-    encoding = metadata.get("encoding", "bgr8")
-
-    # Convert to numpy array
-    flat_array = event["value"].to_numpy()
-
-    if encoding in ["bgr8", "rgb8"]:
-        image = flat_array.reshape((height, width, 3))
-    elif encoding == "gray8":
-        image = flat_array.reshape((height, width))
-
-    return image
-
-# Send image
-def send_image(node, image, encoding="bgr8"):
-    metadata = {
-        "width": str(image.shape[1]),
-        "height": str(image.shape[0]),
-        "encoding": encoding
-    }
-    flat = image.flatten()
-    node.send_output("image", pa.array(flat), metadata)
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#image-handling-python).
 
 ### Working with Audio Data
 
-```python
-import numpy as np
-import pyarrow as pa
-
-# Receive audio
-def handle_audio(event):
-    metadata = event["metadata"]
-    sample_rate = int(metadata.get("sample_rate", 16000))
-    audio = event["value"].to_numpy().astype(np.float32)
-    return audio, sample_rate
-
-# Send audio
-def send_audio(node, audio, sample_rate=16000):
-    metadata = {"sample_rate": str(sample_rate)}
-    node.send_output("audio", pa.array(audio.astype(np.float32)), metadata)
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#audio-handling-python).
 
 ### Using Timeout for Non-blocking
 
-```python
-from dora import Node
-
-node = Node()
-
-while True:
-    event = node.next(timeout=0.1)  # 100ms timeout
-
-    if event is None:
-        # No event received, do background work
-        do_background_task()
-        continue
-
-    if event["type"] == "INPUT":
-        process(event)
-    elif event["type"] == "STOP":
-        break
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#non-blocking-event-loop-python).
 
 ### Package Structure
 
@@ -185,34 +78,7 @@ if __name__ == "__main__":
 
 ### Basic Structure
 
-```rust
-use dora_node_api::{DoraNode, Event};
-use eyre::Result;
-
-fn main() -> Result<()> {
-    let (mut node, mut events) = DoraNode::init_from_env()?;
-
-    while let Some(event) = events.recv() {
-        match event {
-            Event::Input { id, metadata, data } => {
-                // Process input
-                let result = process(&data);
-
-                // Send output
-                node.send_output(
-                    "output".into(),
-                    metadata.parameters,
-                    result.into(),
-                )?;
-            }
-            Event::Stop => break,
-            _ => {}
-        }
-    }
-
-    Ok(())
-}
-```
+See [CODE_TEMPLATES.md](../../../data/CODE_TEMPLATES.md#rust-node-boilerplate).
 
 ### Cargo.toml
 
@@ -227,66 +93,9 @@ dora-node-api = "0.3"
 eyre = "0.6"
 ```
 
-### Working with Arrow Data
-
-```rust
-use arrow::array::{Float32Array, UInt8Array};
-use dora_node_api::arrow::array::ArrayRef;
-
-fn process_image(data: &ArrayRef) -> Vec<f32> {
-    let array = data.as_any()
-        .downcast_ref::<UInt8Array>()
-        .expect("Expected UInt8Array");
-
-    // Process image data
-    let result: Vec<f32> = array.values()
-        .iter()
-        .map(|&v| v as f32 / 255.0)
-        .collect();
-
-    result
-}
-```
-
 ## C++ Node
 
-### Basic Structure
-
-```cpp
-#include "dora-node-api.h"
-#include <iostream>
-
-int main() {
-    auto dora_node = init_dora_node();
-    auto merged_events = dora_events_into_combined(std::move(dora_node.events));
-
-    while (true) {
-        auto event = merged_events->next();
-
-        if (event->is_stop()) {
-            break;
-        }
-
-        if (event->is_input()) {
-            auto input = event->input();
-            std::string id(input.id.ptr, input.id.len);
-
-            // Process input
-            // ...
-
-            // Send output
-            std::vector<uint8_t> result = process(input.data);
-            auto output = dora_node.send_output(
-                {"output", 6},
-                result.data(),
-                result.size()
-            );
-        }
-    }
-
-    return 0;
-}
-```
+C++ nodes follow a similar pattern to Rust. Contact dora-rs documentation for C++ API details.
 
 ## Node Testing
 

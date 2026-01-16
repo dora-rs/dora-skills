@@ -80,7 +80,7 @@ node.send_output("velocity", pa.array(cmd_vel))
 
 ```yaml
 nodes:
-  # Camera
+  # Camera (see COMMON_NODES.md#camera-node)
   - id: camera
     build: pip install opencv-video-capture
     path: opencv-video-capture
@@ -89,7 +89,7 @@ nodes:
     outputs:
       - image
 
-  # Object detection
+  # Object detection (see COMMON_NODES.md#yolo-detection-node)
   - id: detector
     build: pip install dora-yolo
     path: dora-yolo

@@ -92,22 +92,7 @@ nodes:
 
 ## Audio Data Format
 
-All audio uses float32 arrays with metadata:
-
-```python
-# Audio metadata
-metadata = {
-    "sample_rate": "16000",  # Sample rate in Hz
-    "channels": "1",         # Number of channels
-}
-
-# Audio data: float32 array, values in [-1.0, 1.0]
-import numpy as np
-import pyarrow as pa
-
-audio = np.array([0.1, 0.2, -0.1, ...], dtype=np.float32)
-node.send_output("audio", pa.array(audio), metadata)
-```
+See [CODE_TEMPLATES.md](../../data/CODE_TEMPLATES.md#audio-handling-python) for audio data handling patterns.
 
 ## Input Options
 

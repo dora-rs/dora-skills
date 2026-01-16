@@ -1,6 +1,58 @@
 # Data Directory
 
-This directory contains generated data files used by dora-skills commands.
+This directory contains generated data files and shared reference documentation used by dora-skills.
+
+## Reference Files
+
+Shared documentation to reduce redundancy across skill files:
+
+### COMMON_NODES.md
+
+Standard node configurations used across multiple skills. Reference this file instead of duplicating node examples.
+
+**Contents:**
+- Camera, YOLO, Rerun visualization
+- Microphone, VAD, Whisper, Piper TTS
+- SAM2 segmentation, CoTracker tracking
+- Piper robot arm nodes
+- Timer patterns and queue management
+
+**Usage in SKILL.md files:**
+```markdown
+See [COMMON_NODES.md](../../data/COMMON_NODES.md#camera-node)
+```
+
+### CODE_TEMPLATES.md
+
+Reusable code patterns for custom node development. Reference these templates to avoid code duplication.
+
+**Contents:**
+- Python/Rust node boilerplate
+- Image and audio handling functions
+- Detection processing patterns
+- Multiple input handling
+- Error handling and state management
+
+**Usage in SKILL.md files:**
+```markdown
+See [CODE_TEMPLATES.md](../../data/CODE_TEMPLATES.md#python-node-boilerplate)
+```
+
+### CONFIG_REFERENCE.md
+
+Common configuration options and patterns. Reference this for standard settings.
+
+**Contents:**
+- Device configuration (GPU/CPU selection)
+- Queue management patterns
+- Model configurations (YOLO, SAM2, Whisper)
+- Language and audio settings
+- Performance optimization patterns
+
+**Usage in SKILL.md files:**
+```markdown
+See [CONFIG_REFERENCE.md](../../data/CONFIG_REFERENCE.md#device-configuration)
+```
 
 ## nodes.json
 
